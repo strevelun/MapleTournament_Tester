@@ -43,7 +43,34 @@ void Client::JustLogin(const wchar_t* _nickname)
 	*(wchar_t*)(buffer + count) = L'\0';									count += 2;
 	*(ushort*)buffer = count;
 	send(m_hClientSocket, buffer, *(ushort*)buffer, 0);
+}
 
+void Client::JustLogin1Byte(const wchar_t* _nickname)
+{
+	char buffer[255];
+	ushort count = sizeof(ushort);
+	*(ushort*)(buffer + count) = (ushort)ePacketType::C_OKLogin;						count += sizeof(ushort);
+	memcpy(buffer + count, _nickname, wcslen(_nickname) * 2);				count += (ushort)wcslen(_nickname) * 2;
+	*(wchar_t*)(buffer + count) = L'\0';									count += 2;
+	*(ushort*)buffer = count;
+
+	send(m_hClientSocket, buffer, 1, 0);
+	Sleep(300);
+	send(m_hClientSocket, buffer + 1, *(ushort*)buffer - 1, 0);
+}
+
+void Client::JustLogin2Byte(const wchar_t* _nickname)
+{
+	char buffer[255];
+	ushort count = sizeof(ushort);
+	*(ushort*)(buffer + count) = (ushort)ePacketType::C_OKLogin;						count += sizeof(ushort);
+	memcpy(buffer + count, _nickname, wcslen(_nickname) * 2);				count += (ushort)wcslen(_nickname) * 2;
+	*(wchar_t*)(buffer + count) = L'\0';									count += 2;
+	*(ushort*)buffer = count;
+
+	send(m_hClientSocket, buffer, 2, 0);
+	Sleep(300);
+	send(m_hClientSocket, buffer + 2, *(ushort*)buffer - 2, 0);
 }
 
 void Client::MakeRoom(const wchar_t* _roomTitle)
@@ -55,6 +82,25 @@ void Client::MakeRoom(const wchar_t* _roomTitle)
 	*(wchar_t*)(buffer + count) = L'\0';								        count += 2;
 	*(ushort*)buffer = count;
 	send(m_hClientSocket, buffer, *(ushort*)buffer, 0);
+}
+
+void Client::LoginAndMakeRoomOverload(const wchar_t* _nickname, const wchar_t* _roomTitle)
+{
+	char buffer[255];
+	ushort count = sizeof(ushort);
+	*(ushort*)(buffer + count) = (ushort)ePacketType::C_OKLogin;						count += sizeof(ushort);
+	memcpy(buffer + count, _nickname, wcslen(_nickname) * 2);				count += (ushort)wcslen(_nickname) * 2;
+	*(wchar_t*)(buffer + count) = L'\0';									count += 2;
+	*(ushort*)buffer = count;
+	ushort OKLoginCount = count;
+
+	count = sizeof(ushort);
+	*(ushort*)(buffer + OKLoginCount + count) = (ushort)ePacketType::C_CreateRoom;			count += sizeof(ushort);	
+	memcpy(buffer + OKLoginCount + count, _roomTitle, wcslen(_roomTitle) * 2);				count += (ushort)wcslen(_roomTitle) * 2;			
+	*(wchar_t*)(buffer + OKLoginCount + count) = L'\0';										count += 2;		
+	*(ushort*)(buffer + OKLoginCount) = count;
+
+	send(m_hClientSocket, buffer, count + OKLoginCount, 0);
 }
 
 void Client::Logout()
