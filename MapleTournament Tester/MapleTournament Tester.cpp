@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <array>
 #include <string>
+#include <vector>
 
 #include "Client.h"
 
@@ -24,6 +25,7 @@ int main()
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) return 0;
 
 	std::array<Client*, 60> arrClient;
+	std::vector<Client*> vecTrashcan;
 	int clientCount = 0;
 	std::wstring nickname = L"Tester";
 	std::wstring roomName = L"Room";
@@ -59,7 +61,7 @@ int main()
 			for (int i = 0; i < clientCount; i++)
 			{
 				arrClient[i]->Logout();
-				delete arrClient[i];
+				vecTrashcan.push_back(arrClient[i]);
 			}
 			clientCount = 0;
 			continue;
@@ -103,6 +105,10 @@ int main()
 	{
 		delete arrClient[i];
 	}
+
+	size_t trashSize = vecTrashcan.size();
+	for (int i = 0; i < trashSize; i++)
+		delete vecTrashcan[i];
 
 	return 0;
 }
