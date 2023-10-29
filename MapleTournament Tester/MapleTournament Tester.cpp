@@ -15,12 +15,15 @@ enum class eActionType
 	JustLogin2Byte,
 	LoginAndMakeRoom,
 	LoginAndMakeRoomOverload,
-	LogoutAll,
 	NumOfAction
 };
 
 int main()
 {
+	const char * pServerIP = "192.168.219.167";
+	// const char * pServerIP = "220.127.242.178";
+	const int port = 30001;
+
 	WSADATA  wsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) return 0;
 
@@ -35,10 +38,26 @@ int main()
 	while (1)
 	{
 		system("cls");
-		std::cout << "클라이언트 개수 입력(종료 : -1, 최대 60개, 현재 " << clientCount << "개) : ";
+		std::cout << "클라이언트 개수 입력(종료 : -1, 전부 로그아웃 : -2, 최대 60개, 현재 " << clientCount << "개) : ";
 		std::cin >> cnt;
-		if (cnt + clientCount > 60) continue;
 		if (cnt == -1) break;
+		else if (cnt == -2)
+		{
+			for (int i = 0; i < clientCount; i++)
+			{
+				arrClient[i]->Logout();
+				vecTrashcan.push_back(arrClient[i]);
+			}
+			clientCount = 0;
+			continue;
+		}
+		else if (cnt + clientCount > 60) continue;
+		else if(std::cin.fail() || cnt <= -3)
+		{
+			std::cin.clear();
+			std::cin.ignore(1024, '\n');
+			continue;
+		}
 
 		while (1)
 		{
@@ -49,28 +68,22 @@ int main()
 			std::cout << "3. 로그인(broken packet(2바이트 후 전체)" << '\n';
 			std::cout << "4. 로그인 후 방만들기" << '\n';
 			std::cout << "5. 로그인 후 방만들기(overload packet(두개 패킷 한꺼번에))" << '\n';
-			std::cout << "6. 전부 로그아웃" << '\n';
 			std::cout << "입력 : ";
 			std::cin >> input;
 			if (int(eActionType::None) < input && input < int(eActionType::NumOfAction))
 				break;
+			else
+			{
+				std::cin.clear();
+				std::cin.ignore(1024, '\n');
+				continue;
+			}
 		}
 		
-		if (input == int(eActionType::LogoutAll))
-		{ 
-			for (int i = 0; i < clientCount; i++)
-			{
-				arrClient[i]->Logout();
-				vecTrashcan.push_back(arrClient[i]);
-			}
-			clientCount = 0;
-			continue;
-		}
-
 		for (int i = 0; i < cnt; i++)
 		{
 			pClient = new Client;
-			if (pClient->Init("192.168.219.167", 30001) == false)
+			if (pClient->Init(pServerIP, port) == false)
 			{
 				delete pClient;
 				return -1;
