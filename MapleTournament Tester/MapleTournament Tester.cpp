@@ -30,7 +30,7 @@ int main()
 	std::array<Client*, 60> arrClient;
 	std::vector<Client*> vecTrashcan;
 	int clientCount = 0;
-	std::wstring nickname = L"Tester";
+	std::wstring nickname = L"Test";
 	std::wstring roomName = L"Room";
 	int input, cnt, nicknameNum = 0, roomTitleNum = 0;
 	Client* pClient = nullptr;
@@ -88,6 +88,7 @@ int main()
 				delete pClient;
 				return -1;
 			}
+
 			switch (eActionType(input))
 			{
 			case eActionType::JustLogin:
@@ -107,10 +108,27 @@ int main()
 				pClient->LoginAndMakeRoomOverload((nickname + std::to_wstring(nicknameNum++)).c_str(), (roomName + std::to_wstring(roomTitleNum++)).c_str());
 				break;
 			}
-
 		
 			arrClient[clientCount + i] = pClient;
 		}
+
+		if (eActionType(input) == eActionType::JustLogin1Byte || eActionType(input) == eActionType::JustLogin2Byte)
+		{
+			Sleep(300);
+			for (int i = 0; i < cnt; i++)
+			{
+				switch (eActionType(input))
+				{
+				case eActionType::JustLogin1Byte:
+					arrClient[clientCount + i]->JustLogin1ByteLeft();
+					break;
+				case eActionType::JustLogin2Byte:
+					arrClient[clientCount + i]->JustLogin2ByteLeft();
+					break;
+				}
+			}
+		}
+
 		clientCount += cnt;
 	}
 

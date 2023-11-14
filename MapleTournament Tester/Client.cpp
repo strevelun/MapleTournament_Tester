@@ -36,41 +36,44 @@ bool Client::Init(const char* _serverIP, int _serverPort)
 
 void Client::JustLogin(const wchar_t* _nickname)
 {
-	char buffer[255];
 	ushort count = sizeof(ushort);
-	*(ushort*)(buffer + count) = (ushort)ePacketType::C_OKLogin;						count += sizeof(ushort);
-	memcpy(buffer + count, _nickname, wcslen(_nickname) * 2);				count += (ushort)wcslen(_nickname) * 2;
-	*(wchar_t*)(buffer + count) = L'\0';									count += 2;
-	*(ushort*)buffer = count;
-	send(m_hClientSocket, buffer, *(ushort*)buffer, 0);
+	*(ushort*)(m_buffer + count) = (ushort)ePacketType::C_OKLogin;						count += sizeof(ushort);
+	memcpy(m_buffer + count, _nickname, wcslen(_nickname) * 2);				count += (ushort)wcslen(_nickname) * 2;
+	*(wchar_t*)(m_buffer + count) = L'\0';									count += 2;
+	*(ushort*)m_buffer = count;
+	send(m_hClientSocket, m_buffer, *(u_short*)m_buffer, 0);
 }
 
 void Client::JustLogin1Byte(const wchar_t* _nickname)
 {
-	char buffer[255];
 	ushort count = sizeof(ushort);
-	*(ushort*)(buffer + count) = (ushort)ePacketType::C_OKLogin;						count += sizeof(ushort);
-	memcpy(buffer + count, _nickname, wcslen(_nickname) * 2);				count += (ushort)wcslen(_nickname) * 2;
-	*(wchar_t*)(buffer + count) = L'\0';									count += 2;
-	*(ushort*)buffer = count;
+	*(ushort*)(m_buffer + count) = (ushort)ePacketType::C_OKLogin;						count += sizeof(ushort);
+	memcpy(m_buffer + count, _nickname, wcslen(_nickname) * 2);				count += (ushort)wcslen(_nickname) * 2;
+	*(wchar_t*)(m_buffer + count) = L'\0';									count += 2;
+	*(ushort*)m_buffer = count;
 
-	send(m_hClientSocket, buffer, 1, 0);
-	Sleep(300);
-	send(m_hClientSocket, buffer + 1, *(ushort*)buffer - 1, 0);
+	send(m_hClientSocket, m_buffer, 1, 0);
+}
+
+void Client::JustLogin1ByteLeft()
+{
+	send(m_hClientSocket, m_buffer + 1, *(ushort*)m_buffer - 1, 0);
 }
 
 void Client::JustLogin2Byte(const wchar_t* _nickname)
 {
-	char buffer[255];
 	ushort count = sizeof(ushort);
-	*(ushort*)(buffer + count) = (ushort)ePacketType::C_OKLogin;						count += sizeof(ushort);
-	memcpy(buffer + count, _nickname, wcslen(_nickname) * 2);				count += (ushort)wcslen(_nickname) * 2;
-	*(wchar_t*)(buffer + count) = L'\0';									count += 2;
-	*(ushort*)buffer = count;
+	*(ushort*)(m_buffer + count) = (ushort)ePacketType::C_OKLogin;						count += sizeof(ushort);
+	memcpy(m_buffer + count, _nickname, wcslen(_nickname) * 2);				count += (ushort)wcslen(_nickname) * 2;
+	*(wchar_t*)(m_buffer + count) = L'\0';									count += 2;
+	*(ushort*)m_buffer = count;
 
-	send(m_hClientSocket, buffer, 2, 0);
-	Sleep(300);
-	send(m_hClientSocket, buffer + 2, *(ushort*)buffer - 2, 0);
+	send(m_hClientSocket, m_buffer, 2, 0);
+}
+
+void Client::JustLogin2ByteLeft()
+{
+	send(m_hClientSocket, m_buffer + 2, *(ushort*)m_buffer - 2, 0);
 }
 
 void Client::MakeRoom(const wchar_t* _roomTitle)
