@@ -7,6 +7,8 @@
 
 #pragma comment( lib, "ws2_32.lib")
 
+#define MAX_CLIENT_SIZE			63
+
 enum class eActionType
 {
 	None,
@@ -27,7 +29,7 @@ int main()
 	WSADATA  wsaData;
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) return 0;
 
-	std::array<Client*, 60> arrClient;
+	std::array<Client*, MAX_CLIENT_SIZE> arrClient;
 	std::vector<Client*> vecTrashcan;
 	int clientCount = 0;
 	std::wstring nickname = L"Test";
@@ -38,7 +40,7 @@ int main()
 	while (1)
 	{
 		system("cls");
-		std::cout << "클라이언트 개수 입력(종료 : -1, 전부 로그아웃 : -2, 최대 60개, 현재 " << clientCount << "개) : ";
+		std::cout << "클라이언트 개수 입력(종료 : -1, 전부 로그아웃 : -2, 최대 63개, 현재 " << clientCount << "개) : ";
 		std::cin >> cnt;
 		if (cnt == -1) break;
 		else if (cnt == -2)
@@ -51,7 +53,7 @@ int main()
 			clientCount = 0;
 			continue;
 		}
-		else if (cnt + clientCount > 60) continue;
+		else if (cnt + clientCount > MAX_CLIENT_SIZE) continue;
 		else if(std::cin.fail() || cnt <= -3)
 		{
 			std::cin.clear();
